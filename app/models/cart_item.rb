@@ -2,7 +2,7 @@ class CartItem < ActiveRecord::Base
   belongs_to :cart, inverse_of: :cart_items
   belongs_to :item, inverse_of: :cart_items
 
-  delegate :name, :discount, :price, :discounted_price, to: :item, prefix: 'item'
+  delegate :name, :discount, :price, :final_price, to: :item, prefix: 'item'
 
   validates :cart_id, presence: true
   validates :item_id, presence: true
