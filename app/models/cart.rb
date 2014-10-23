@@ -33,7 +33,7 @@ class Cart < ActiveRecord::Base
   end
 
   def gross_total
-    self.cart_items.map{ |ci| ci.item_final_price * ci.size }.sum
+    self.cart_items.map(&:final_price).sum
   end
 
   def apply_volume_discount?
@@ -62,6 +62,18 @@ class Cart < ActiveRecord::Base
       self[:final_price]
     else
       self.rounded_final_price
+    end
+  end
+
+  def item_category_total_discount
+    self.cart_items.map(&:discount_price_difference).sum
+  end
+
+  def total_discount
+    if self.apply_volume_discount?
+      self.item_category_total_discount + self.volume_discount_amount
+    else
+      self.item_category_total_discount
     end
   end
 

@@ -63,12 +63,12 @@ end
 # 1 Coffee 500g at 3.21
 # 1 Pasta 1Kg at 4.29
 # 1 Cake at 2.35
-# second_cart = Cart.create.tap do |cart|
-#   cart.add coffee
-#   cart.add pasta1kg
-#   cart.add cake
-#   cart.checkout!
-# end
+second_cart = Cart.create.tap do |cart|
+  cart.add coffee
+  cart.add pasta1kg
+  cart.add cake
+  cart.checkout!
+end
 
 
 ##
@@ -77,10 +77,10 @@ end
 # 1 Wine at 10.5
 # 1 Book at 15.05
 # 5 Apple at 0.5
-# third_cart = Cart.create.tap do |cart|
-#   cart.add chocolate, 10
-#   cart.add wine
-#   cart.add book
-#   cart.add apple, 5
-#   cart.checkout!
-# end
+third_cart = Cart.create.tap do |cart|
+  cart.add chocolate, 10
+  cart.add wine
+  cart.add another_book
+  cart.add apple, 5
+  cart.checkout!
+end

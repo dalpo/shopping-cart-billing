@@ -1,0 +1,53 @@
+.well.well-sm
+  .page-header
+    %h3= cart.name
+
+
+  %table.table
+    %thead
+      %tr
+        %th
+        %th Quantity
+        %th UnitPrice
+        %th Discount
+        %th Final Price
+
+    %tbody
+      - cart.cart_items.each do |ci|
+        %tr
+          %td= ci.item_name
+          %td= ci.size
+          %td= number_to_currency(ci.item_price)
+          %td #{ci.item_discount} %
+          %td= number_to_currency(ci.final_price)
+
+      - if cart.apply_volume_discount?
+        %tr
+          %th
+            %strong Gross total
+          %th
+          %th
+          %th
+          %th
+            %strong= number_to_currency(cart.gross_total)
+
+
+        %tr
+          %td Volume discount
+          %td
+          %td
+          %td #{Cart::VOLUME_DISCOUNT} %
+          %td= number_to_currency(cart.volume_discount_amount)
+
+    %tfoot
+      %tr
+        %th
+          %strong Total
+        %th
+        %th
+        %th
+        %th
+          %strong= number_to_currency(cart.final_price)
+
+  %p.text-center
+    %em ( Total discounts #{number_to_currency(cart.total_discount)} )

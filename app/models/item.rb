@@ -10,6 +10,7 @@ class Item < ActiveRecord::Base
   def category_discount
     self.item_category.try(:discount) || 0.0
   end
+  alias_method :discount, :category_discount
 
   def discount_price_difference
     if self.category_discount > 0.0
