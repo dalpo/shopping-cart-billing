@@ -38,3 +38,8 @@ group :development, :test do
   gem 'pry-rails'
   gem 'pry-byebug'
 end
+
+group :test do
+  gem 'shoulda-matchers', require: false
+  gem 'simplecov',        require: false
+end

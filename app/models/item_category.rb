@@ -1,7 +1,7 @@
 class ItemCategory < ActiveRecord::Base
   has_many :items, inverse_of: :item_category
 
-  validates :name, presence: true, uniqueness: true
+  validates :name, presence: true
 
   after_initialize :set_default_values
 
