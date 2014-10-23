@@ -15,4 +15,58 @@ RSpec.describe CartItem, type: :model do
         .only_integer
     end
   end
+
+  describe '#discount_price_difference' do
+    context 'when discounted' do
+      let(:cart)  { create :cart }
+      let(:item) { create :item_with_discount, price: 100.0 }
+
+      context 'its item_category discount' do
+        subject { item.item_category.discount }
+
+        # Check the factory discount
+        it { is_expected.to eq 10.0 }
+      end
+
+      context 'with one product' do
+        before(:each) { cart.add item }
+        subject { cart.cart_items.first.discount_price_difference }
+
+        it { is_expected.to eq 10.0 }
+      end
+
+      context 'with more products' do
+        before(:each) { cart.add item, 3 }
+        subject { cart.cart_items.first.discount_price_difference }
+
+        it { is_expected.to eq 30.0 }
+      end
+    end
+
+    context 'without any discount' do
+      let(:cart)  { create :cart }
+      let(:item) { create :item_without_discount, price: 100.0 }
+
+      context 'its item_category discount' do
+        subject { item.item_category.discount }
+
+        # Check the factory discount
+        it { is_expected.to eq 0.0 }
+      end
+
+      context 'with one product' do
+        before(:each) { cart.add item }
+        subject { cart.cart_items.first.discount_price_difference }
+
+        it { is_expected.to eq 0.0 }
+      end
+
+      context 'with more products' do
+        before(:each) { cart.add item, 3 }
+        subject { cart.cart_items.first.discount_price_difference }
+
+        it { is_expected.to eq 0.0 }
+      end
+    end
+  end
 end

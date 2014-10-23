@@ -257,4 +257,134 @@ RSpec.describe Cart, type: :model do
       end
     end
   end
+
+  describe '#item_category_total_discount' do
+    context 'when discounted' do
+      let(:cart)  { create :cart }
+      let(:item1) { create :item_with_discount, price: 100.0 }
+      let(:item2) { create :item_with_discount, price: 200.0 }
+
+      context 'its item_category discount' do
+        subject { item1.item_category.discount }
+
+        # Check the factory discount
+        it { is_expected.to eq 10.0 }
+      end
+
+      context 'with one product' do
+        before(:each) { cart.add item1 }
+        subject { cart.item_category_total_discount }
+
+        it { is_expected.to eq 10.0 }
+      end
+
+      context 'with more of the same products' do
+        before(:each) { cart.add item1, 3 }
+        subject { cart.item_category_total_discount }
+
+        it { is_expected.to eq 30.0 }
+      end
+
+      context 'with different products' do
+        before(:each) do
+          cart.add item1, 3
+          cart.add item2, 2
+        end
+        subject { cart.item_category_total_discount }
+
+        it { is_expected.to eq 70.0 }
+      end
+    end
+
+    context 'without any discount' do
+      let(:cart)  { create :cart }
+      let(:item1) { create :item_without_discount, price: 100.0 }
+      let(:item2) { create :item_without_discount, price: 200.0 }
+
+      context 'its item_category discount' do
+        subject { item1.item_category.discount }
+
+        # Check the factory discount
+        it { is_expected.to eq 0.0 }
+      end
+
+      context 'with one product' do
+        before(:each) { cart.add item1 }
+        subject { cart.item_category_total_discount }
+
+        it { is_expected.to eq 0.0 }
+      end
+
+      context 'with more of the same products' do
+        before(:each) { cart.add item1, 3 }
+        subject { cart.item_category_total_discount }
+
+        it { is_expected.to eq 0.0 }
+      end
+
+      context 'with different products' do
+        before(:each) do
+          cart.add item1, 3
+          cart.add item2, 2
+        end
+        subject { cart.item_category_total_discount }
+
+        it { is_expected.to eq 0.0 }
+      end
+    end
+  end
+
+  describe '#total_discount' do
+    let(:cart)  { create :cart_with_items }
+
+    context "when the gross_total amount exceeds #{Cart::MIN_PRICE_VOLUME_DISCOUNT} euros" do
+      let(:highter_gross_total) { Cart::MIN_PRICE_VOLUME_DISCOUNT + 10 }
+
+      before :each do
+        allow(cart).to receive(:gross_total) { highter_gross_total }
+      end
+
+      subject { cart.total_discount }
+
+      it { is_expected.to eq (highter_gross_total * Cart::VOLUME_DISCOUNT / 100.0) }
+    end
+
+    context "when the gross_total amount doesn't exceeds #{Cart::MIN_PRICE_VOLUME_DISCOUNT} euros" do
+      let(:lower_gross_total) { Cart::MIN_PRICE_VOLUME_DISCOUNT - 10 }
+
+      before :each do
+        allow(cart).to receive(:gross_total) { lower_gross_total }
+      end
+
+      subject { cart.total_discount }
+
+      it { is_expected.to eq 0.0 }
+    end
+  end
+
+  context 'state machine events' do
+    describe '#checkout!' do
+      let(:cart) { create :cart_with_items }
+
+      it 'has the billed_at data blank' do
+        expect(cart.billed_at).to be_blank
+      end
+
+      it 'has the database value of final_price blank' do
+        expect(cart[:final_price]).to be_blank
+      end
+
+      context 'after the checkout' do
+        before(:each) { cart.checkout! }
+
+        it 'has the billed_at data present' do
+          expect(cart.billed_at).to be_present
+        end
+
+        it 'has the database value of final_price with cart total amount' do
+          expect(cart[:final_price]).to eq cart.final_price
+        end
+      end
+    end
+  end
 end
